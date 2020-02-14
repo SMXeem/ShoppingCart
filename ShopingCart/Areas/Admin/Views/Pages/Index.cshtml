@@ -7,7 +7,7 @@
 <h2>Pages</h2>
 
 <p>
-    @Html.ActionLink("Create New", "Create")
+    @Html.ActionLink("Create New", "AddPage")
 </p>
 @if (!Model.Any())
 {
@@ -42,9 +42,9 @@ else
                 @Html.DisplayFor(modelItem => item.HasSidebar)
             </td>
             <td>
-                @Html.ActionLink("Edit", "Edit", new { id=item.Id }) |
-                @Html.ActionLink("Details", "Details", new { id=item.Id }) |
-                @Html.ActionLink("Delete", "Delete", new { id=item.Id })
+                @Html.ActionLink("Edit", "EditPage", new { id=item.Id }) |
+                @Html.ActionLink("Details", "PageDetails", new { id=item.Id }) |
+                @Html.ActionLink("Delete", "DeletePage", new { id=item.Id })
             </td>
         </tr>
     }

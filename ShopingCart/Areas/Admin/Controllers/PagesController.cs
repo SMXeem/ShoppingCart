@@ -20,7 +20,7 @@ namespace ShopingCart.Areas.Admin.Controllers
             }
             return View(pagelist);
         }
-        //Add Page
+        // GET: Admin/Pages/AddPage
         [HttpGet]
         public ActionResult AddPage()
         {
@@ -82,5 +82,91 @@ namespace ShopingCart.Areas.Admin.Controllers
 
             return RedirectToAction("AddPage");
         }
+
+        // GET: Admin/Pages/EditPage/Id
+        [HttpGet]
+        public ActionResult EditPage(int id)
+        {
+            // Declare pageVM
+            PageVM aPage;
+
+            using (Db db = new Db())
+            {
+                // Get the page
+                PagesDt dto = db.Pages.Find(id);
+
+                // Confirm page exists return Content("The page does not exist.");
+                if(dto==null)
+                {
+                    return Content("This Page does not exist");
+                }
+
+                // Init pageVM
+                aPage = new PageVM(dto);
+            }
+            
+            // Return view with model
+            return View(aPage);
+        }
+        [HttpPost]
+        public ActionResult EditPage(PageVM aPage)
+        {
+            // Check model state
+            if (!ModelState.IsValid)
+            {
+                return View(aPage);
+            }
+
+            using (Db db = new Db())
+            {
+                // Get page id
+                int id = aPage.Id;
+
+                // Init slug
+                string slug = "home";
+
+                // Get the page
+                PagesDt dto = db.Pages.Find(id);
+
+                // DTO the title
+                dto.Title = aPage.Title;
+
+                // Check for slug and set it if need be
+                if (aPage.Slug != "home")
+                {
+                    if (string.IsNullOrWhiteSpace(aPage.Slug))
+                    {
+                        slug = aPage.Title.Replace(" ", "-").ToLower();
+                    }
+                    else
+                    {
+                        slug = aPage.Slug.Replace(" ", "-").ToLower();
+                    }
+                }
+
+                // Make sure title and slug are unique
+                if (db.Pages.Where(x => x.Id != id).Any(x => x.Title == aPage.Title) ||
+                     db.Pages.Where(x => x.Id != id).Any(x => x.Slug == slug))
+                {
+                    ModelState.AddModelError("", "That title or slug already exists.");
+                    return View(aPage);
+                }
+
+                // DTO the rest
+                dto.Slug = slug;
+                dto.Body = aPage.Body;
+                dto.HasSidebar = aPage.HasSidebar;
+
+                // Save the DTO
+                db.SaveChanges();
+            }
+
+            // Set TempData message
+            TempData["SM"] = "You have edited the page!";
+
+            // Redirect
+            return RedirectToAction("EditPage");
+        }
     }
+
 }
