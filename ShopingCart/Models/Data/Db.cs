@@ -8,5 +8,6 @@ namespace ShopingCart.Models.Data
 {
     public class Db:DbContext
     {
+        public DbSet<PagesDt> Pages { get; set; }
     }
 }
